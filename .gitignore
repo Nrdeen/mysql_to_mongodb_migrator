@@ -1,0 +1,29 @@
+node_modules/
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+API_DOCUMENTATION.md
+AWS_DEPLOYMENT_GUIDE.md
+MANAGER_README.md
+PROJECT_DOCUMENTATION.md
+QUICK_START.md
+SCALABILITY_GUIDE.md
+SHARING_WITH_MANAGER.md
+TESTING_GUIDE.md
+WRAPPER_USAGE_GUIDE.md
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+python-fastapi/.venv/
+python-envelope-only/.venv/
+python-envelope-only/__pycache__/
+python-fastapi/__pycache__/
+
+# Multi-project node_modules
+node-envelope-only/node_modules/
+

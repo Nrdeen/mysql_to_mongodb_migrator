@@ -1,0 +1,553 @@
+{
+  "info": {
+    "_postman_id": "b5c0b55d-3d33-4c70-b4b6-8dbb5bf6d1f0",
+    "name": "MongoDB-MySQL Wrapper API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const dbType = pm.collectionVariables.get('dbType') || 'mongodb';",
+          "pm.collectionVariables.set('dbType', dbType);",
+          "pm.request.headers.upsert({ key: 'x-db-type', value: dbType });",
+          "",
+          "const tokenKey = dbType === 'mysql' ? 'tokenMysql' : 'tokenMongo';",
+          "const userIdKey = dbType === 'mysql' ? 'userIdMysql' : 'userIdMongo';",
+          "const adminTokenKey = dbType === 'mysql' ? 'adminTokenMysql' : 'adminTokenMongo';",
+          "const adminUserIdKey = dbType === 'mysql' ? 'adminUserIdMysql' : 'adminUserIdMongo';",
+          "",
+          "const t = pm.collectionVariables.get(tokenKey);",
+          "if (t) pm.collectionVariables.set('token', t);",
+          "const uid = pm.collectionVariables.get(userIdKey);",
+          "if (uid) pm.collectionVariables.set('userId', uid);",
+          "",
+          "const at = pm.collectionVariables.get(adminTokenKey);",
+          "if (at) pm.collectionVariables.set('adminToken', at);",
+          "const auid = pm.collectionVariables.get(adminUserIdKey);",
+          "if (auid) pm.collectionVariables.set('adminUserId', auid);"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Auth - Signup",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const email = pm.collectionVariables.get('userEmail');",
+                  "const password = pm.collectionVariables.get('userPassword');",
+                  "if (!email) pm.collectionVariables.set('userEmail', `test+${Date.now()}@example.com`);",
+                  "if (!password) pm.collectionVariables.set('userPassword', 'test123456');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const dbType = pm.collectionVariables.get('dbType') || 'mongodb';",
+                  "  const tokenKey = dbType === 'mysql' ? 'tokenMysql' : 'tokenMongo';",
+                  "  const userIdKey = dbType === 'mysql' ? 'userIdMysql' : 'userIdMongo';",
+                  "  const token = json?.data?.token;",
+                  "  const user = json?.data?.user;",
+                  "  const userId = user?._id ?? user?.id;",
+                  "  if (token) pm.collectionVariables.set('token', token);",
+                  "  if (token) pm.collectionVariables.set(tokenKey, token);",
+                  "  if (userId !== undefined && userId !== null) pm.collectionVariables.set('userId', String(userId));",
+                  "  if (userId !== undefined && userId !== null) pm.collectionVariables.set(userIdKey, String(userId));",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\",\n  \"name\": \"Test User\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Auth - Login (sets token + userId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const dbType = pm.collectionVariables.get('dbType') || 'mongodb';",
+                  "  const tokenKey = dbType === 'mysql' ? 'tokenMysql' : 'tokenMongo';",
+                  "  const userIdKey = dbType === 'mysql' ? 'userIdMysql' : 'userIdMongo';",
+                  "  const token = json?.data?.token;",
+                  "  const user = json?.data?.user;",
+                  "  const userId = user?._id ?? user?.id;",
+                  "  if (token) pm.collectionVariables.set('token', token);",
+                  "  if (token) pm.collectionVariables.set(tokenKey, token);",
+                  "  if (userId !== undefined && userId !== null) pm.collectionVariables.set('userId', String(userId));",
+                  "  if (userId !== undefined && userId !== null) pm.collectionVariables.set(userIdKey, String(userId));",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Admin - Signup",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const email = pm.collectionVariables.get('adminEmail');",
+                  "const password = pm.collectionVariables.get('adminPassword');",
+                  "if (!email) pm.collectionVariables.set('adminEmail', `admin+${Date.now()}@example.com`);",
+                  "if (!password) pm.collectionVariables.set('adminPassword', 'admin123456');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\",\n  \"name\": \"Admin User\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/signup", "host": ["{{baseUrl}}"], "path": ["api", "auth", "signup"] }
+          }
+        },
+        {
+          "name": "Admin - Login (sets adminToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const dbType = pm.collectionVariables.get('dbType') || 'mongodb';",
+                  "  const adminTokenKey = dbType === 'mysql' ? 'adminTokenMysql' : 'adminTokenMongo';",
+                  "  const adminUserIdKey = dbType === 'mysql' ? 'adminUserIdMysql' : 'adminUserIdMongo';",
+                  "  const token = json?.data?.token;",
+                  "  const user = json?.data?.user;",
+                  "  const userId = user?._id ?? user?.id;",
+                  "  if (token) pm.collectionVariables.set('adminToken', token);",
+                  "  if (token) pm.collectionVariables.set(adminTokenKey, token);",
+                  "  if (userId !== undefined && userId !== null) pm.collectionVariables.set('adminUserId', String(userId));",
+                  "  if (userId !== undefined && userId !== null) pm.collectionVariables.set(adminUserIdKey, String(userId));",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Auth - Me",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Users - List (admin only)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users?page=1&limit=10&sort=-createdAt",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "-createdAt" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Users - Search (admin only)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/search?q=test",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "search"],
+              "query": [{ "key": "q", "value": "test" }]
+            }
+          }
+        },
+        {
+          "name": "Users - Get by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Users - Update by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Name\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        },
+        {
+          "name": "Users - Delete by ID (admin only)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] },
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Posts - Create (sets postId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const post = json?.data;",
+                  "  const postId = post?._id ?? post?.id;",
+                  "  if (postId !== undefined && postId !== null) pm.collectionVariables.set('postId', String(postId));",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Hello world\",\n  \"content\": \"My first post\",\n  \"status\": \"draft\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/posts", "host": ["{{baseUrl}}"], "path": ["api", "posts"] }
+          }
+        },
+        {
+          "name": "Posts - List (my posts unless admin)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?page=1&limit=10&sort=-createdAt",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sort", "value": "-createdAt" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Posts - Search",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/search?q=hello",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "search"],
+              "query": [{ "key": "q", "value": "hello" }]
+            }
+          }
+        },
+        {
+          "name": "Posts - Get by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["api", "posts", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "Posts - Update by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"published\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["api", "posts", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "Posts - Delete by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["api", "posts", "{{postId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Demo",
+      "item": [
+        {
+          "name": "Demo - Bulk Create Posts (insertMany)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"count\": 5,\n  \"prefix\": \"demo\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/demo/posts/bulk", "host": ["{{baseUrl}}"], "path": ["api", "demo", "posts", "bulk"] }
+          }
+        },
+        {
+          "name": "Demo - Count My Posts (count)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/demo/posts/count", "host": ["{{baseUrl}}"], "path": ["api", "demo", "posts", "count"] }
+          }
+        },
+        {
+          "name": "Demo - Publish Many (updateMany)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fromStatus\": \"draft\",\n  \"toStatus\": \"published\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/demo/posts/publish-many", "host": ["{{baseUrl}}"], "path": ["api", "demo", "posts", "publish-many"] }
+          }
+        },
+        {
+          "name": "Demo - Aggregate (aggregate)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pipeline\": [\n    { \"$match\": { \"status\": \"published\" } },\n    { \"$sort\": { \"createdAt\": -1 } },\n    { \"$limit\": 5 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/demo/posts/aggregate", "host": ["{{baseUrl}}"], "path": ["api", "demo", "posts", "aggregate"] }
+          }
+        },
+        {
+          "name": "Demo - Delete Many Drafts (deleteMany)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "DELETE",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"draft\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/demo/posts/delete-many", "host": ["{{baseUrl}}"], "path": ["api", "demo", "posts", "delete-many"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Envelopes",
+      "item": [
+        {
+          "name": "Envelopes - Create (insert)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const env = json?.data;",
+                  "  const eid = env?.EId;",
+                  "  if (eid) pm.collectionVariables.set('envelopeEId', String(eid));",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"ETId\": \"ET-1\",\n  \"SV\": 1,\n  \"ORGId\": \"ORG-1\",\n  \"Data\": \"hello\",\n  \"SL\": \"local\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/envelopes", "host": ["{{baseUrl}}"], "path": ["api", "envelopes"] }
+          }
+        },
+        {
+          "name": "Envelopes - Get by EId (findOne)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/envelopes/{{envelopeEId}}", "host": ["{{baseUrl}}"], "path": ["api", "envelopes", "{{envelopeEId}}"] }
+          }
+        },
+        {
+          "name": "Envelopes - List (find)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/envelopes?limit=10&skip=0&sort=-CreatedAt",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "envelopes"],
+              "query": [
+                { "key": "limit", "value": "10" },
+                { "key": "skip", "value": "0" },
+                { "key": "sort", "value": "-CreatedAt" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Envelopes - Update by EId (updateOne)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"ES\": 20,\n  \"Data\": \"updated\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/envelopes/{{envelopeEId}}", "host": ["{{baseUrl}}"], "path": ["api", "envelopes", "{{envelopeEId}}"] }
+          }
+        },
+        {
+          "name": "Envelopes - Bulk Status Update (updateMany)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"oldStatus\": 10,\n  \"newStatus\": 20\n}" },
+            "url": { "raw": "{{baseUrl}}/api/envelopes/status/bulk", "host": ["{{baseUrl}}"], "path": ["api", "envelopes", "status", "bulk"] }
+          }
+        },
+        {
+          "name": "Envelopes - Count (count)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/envelopes/_meta/count", "host": ["{{baseUrl}}"], "path": ["api", "envelopes", "_meta", "count"] }
+          }
+        },
+        {
+          "name": "Envelopes - Distinct ETId (distinct)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/envelopes/_meta/distinct/ETId", "host": ["{{baseUrl}}"], "path": ["api", "envelopes", "_meta", "distinct", "ETId"] }
+          }
+        },
+        {
+          "name": "Envelopes - Exists by EId (exists)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/envelopes/_meta/exists/{{envelopeEId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "envelopes", "_meta", "exists", "{{envelopeEId}}"]
+            }
+          }
+        },
+        {
+          "name": "Envelopes - Aggregate (aggregate)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pipeline\": [\n    { \"$match\": { \"ES\": 20 } },\n    { \"$sort\": { \"CreatedAt\": -1 } },\n    { \"$limit\": 5 }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/envelopes/_meta/aggregate", "host": ["{{baseUrl}}"], "path": ["api", "envelopes", "_meta", "aggregate"] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "dbType", "value": "mysql" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "tokenMongo", "value": "" },
+    { "key": "userIdMongo", "value": "" },
+    { "key": "tokenMysql", "value": "" },
+    { "key": "userIdMysql", "value": "" },
+    { "key": "postId", "value": "" },
+    { "key": "userEmail", "value": "" },
+    { "key": "userPassword", "value": "" },
+    { "key": "adminEmail", "value": "" },
+    { "key": "adminPassword", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "adminUserId", "value": "" },
+    { "key": "adminTokenMongo", "value": "" },
+    { "key": "adminUserIdMongo", "value": "" },
+    { "key": "adminTokenMysql", "value": "" },
+    { "key": "adminUserIdMysql", "value": "" },
+    { "key": "envelopeEId", "value": "" }
+  ]
+}
+

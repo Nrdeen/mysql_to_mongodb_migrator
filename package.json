@@ -1,0 +1,42 @@
+{
+  "name": "mongodb-mysql-wrapper",
+  "version": "1.0.0",
+  "description": "Universal database wrapper supporting MongoDB and MySQL",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "setup": "bash scripts/setup.sh",
+    "dev:mysql": "DB_TYPE=mysql DB_DEFAULT=mysql nodemon src/app.js",
+    "dev:mongo": "DB_TYPE=mongodb DB_DEFAULT=mongodb nodemon src/app.js",
+    "dev:both": "DB_TYPE=both DB_DEFAULT=mongodb nodemon src/app.js",
+    "smoke:mongo": "bash scripts/smoke_mongo.sh",
+    "verify:mongo": "bash scripts/verify_mongo.sh",
+    "verify:all": "bash scripts/verify_all_apis.sh",
+    "test:all": "bash scripts/test_all_modes.sh",
+    "demo:mongo-mysql": "bash scripts/demo_mongo_then_mysql.sh",
+    "test:comprehensive": "node src/tests/TestRunner.js",
+    "test:connection": "node -e \"require('./src/tests/ConnectionTests.js')\"",
+    "test:schema": "node -e \"require('./src/tests/SchemaDiscoveryTests.js')\"",
+    "test:migration": "node -e \"require('./src/tests/MigrationTests.js')\"",
+    "test:reports": "node -e \"require('./src/tests/ReportTests.js')\""
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.3",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^7.2.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.0.0",
+    "mongoose": "^8.9.5",
+    "mssql": "^10.0.1",
+    "mysql2": "^3.14.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
