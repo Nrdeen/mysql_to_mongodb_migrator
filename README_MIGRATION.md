@@ -1,17 +1,410 @@
-# Database Migration Tool: MySQL/MSSQL to MongoDB
+# Database Migrator: MySQL/MSSQL - MongoDB
 
-**🎯 Purpose**: Comprehensive tool for discovering and migrating database schemas from MySQL or MSSQL to MongoDB with complete analysis and reporting.
+**🎯 Amaç**: MySQL veya MSSQL veritabanlarından MongoDB'ye tam analiz ve raporlama ile veritabanı şemalarını keşfetmek ve göçürmek için kapsamlı bir araç.
 
-## 📋 Overview
+## 📋 Özet
 
-This project provides a complete database migration solution that:
+Bu proje tam bir veritabanı göç çözümü sağlar:
 
-1. **Discovers** entire database schemas from MySQL or MSSQL
-2. **Analyzes** schema structure and identifies unmappable features
-3. **Plans** the migration strategy with optimal data structure
-4. **Migrates** data safely and idempotently to MongoDB
-5. **Reports** comprehensive technical documentation
-6. **Handles** incompatibilities with practical solutions
+1. **Keşfeder** - MySQL veya MSSQL'den tam veritabanı şemalarını
+2. **Analiz Eder** - Şema yapısını analiz eder ve dönüştürülemeyen özellikleri tanımlar
+3. **Planlama Yapar** - Optimal veri yapısı ile göç stratejisini planlar
+4. **Verileri Göçürür** - Verileri güvenli ve idempotent şekilde MongoDB'ye taşır
+5. **Raporlar** - Kapsamlı teknik dokümantasyon oluşturur
+6. **Uyumluluğu Yönetir** - Uyumsuzlukları pratik çözümlerle giderir
+
+## 🚀 Hızlı Başlangıç
+
+### Gereksinimler
+- Node.js 16+
+- npm veya yarn
+- MongoDB Atlas veya yerel MongoDB örneği
+- MySQL/MSSQL veritabanı (isteğe bağlı, test için)
+
+### Kurulum
+
+```bash
+# Klonla ve kur
+npm install
+cp .env.example .env
+
+# Veritabanlarını .env dosyasında yapılandır
+# MONGODB_URI=mongodb+srv://...
+# MYSQL_HOST=localhost, MYSQL_USER=root, vb.
+
+# Sunucuyu başlat
+npm run dev
+```
+
+**Sunucu çalışması**: `http://localhost:3000`
+
+### API Dokümantasyon
+
+İnteraktif API dokümantasyonuna erişin:
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **Sağlık Kontrolü**: `http://localhost:3000/health`
+
+## 📚 Dokümantasyon
+
+| Dokument | Amaç |
+|----------|------|
+| **[DOCUMENTATION.md](./DOCUMENTATION.md)** | Tam göç API referansı ve örnekler |
+| **[schema.sql](./schema.sql)** | Test için örnek SQL şeması |
+| **Swagger UI** | `/api-docs` adresinde interaktif API dokusu |
+
+## 🔧 Temel Özellikler
+
+### 1. Şema Keşfi
+- Tüm tabloları, kolonları, indeksleri, constraint'leri otomatik keşfeder
+- İlişkileri, trigger'ları, stored procedure'ları, fonksiyonları tanımlar
+- İstatistik toplayıp (satır sayıları, veri boyutları)
+- MySQL ve MSSQL ikisini de destekler
+
+### 2. Veri Tipi Eşlemesi
+SQL ve MongoDB tipleri arasında akıllı dönüşüm:
+```
+MySQL INT → MongoDB number
+MySQL DATETIME → MongoDB date
+MySQL VARCHAR → MongoDB string
+MySQL JSON → MongoDB object
+MySQL BLOB → MongoDB binary
+```
+
+### 3. Göç Planlama
+- İyi MongoDB koleksiyonu yapısı oluşturur
+- İndeks oluşturmayı planlar
+- İlişki yönetimi stratejilerini tanımlar
+- Dönüştürülemeyen özellikleri belgelendirerek
+
+### 4. Güvenli Veri Göçü
+- **İdempotent**: Veri tekrarlanmasız yeniden çalıştırılabilir
+- **Batch İşleme**: Büyük veri setlerini verimli şekilde işler
+- **Hata Kurtarma**: Kapsamlı hata işleme
+- **İlerleme Takibi**: Göç durumunu gerçek zamanda izle
+
+### 5. Kapsamlı Raporlama
+Ayrıntılı teknik raporlar oluşturur:
+- Şema analizi ve istatistikleri
+- Göç planı detayları
+- Alan eşlemeleri ve dönüşümleri
+- Dönüştürülemeyen öğeler ve alternatifler
+- Performance önerileri
+
+## 🛣️ Göç İş Akışı
+
+```
+1. Bağlantı Testi
+   ├─ Kaynak veritabanını doğrula
+   └─ MongoDB bağlantısını doğrula
+   
+2. Şema Keşfi
+   ├─ Tabloları ve kolonları analiz et
+   ├─ İlişkileri tanımla
+   ├─ Trigger'ları/procedure'ları bul
+   └─ Şema özeti oluştur
+   
+3. Göç Planlama
+   ├─ Tabloları koleksiyonlara eşle
+   ├─ Alan adlarını dönüştür
+   ├─ İndeksleri planla
+   └─ Dönüştürülemeyen öğeleri belirle
+   
+4. Veri Göçürme
+   ├─ Şema doğrulaması ile koleksiyonlar oluştur
+   ├─ Tür dönüşümü ile veri aktar
+   ├─ İndeksler oluştur
+   └─ İlişkileri yönet
+   
+5. Rapor Oluştur
+   ├─ Analiz ve istatistikler
+   ├─ Öneriler
+   ├─ Çözümlü dönüştürülemeyen öğeler
+   └─ Performance metrikler
+```
+
+## 📡 API Endpoints'ler
+
+### Şema Keşfi (Veri Değiştirmez)
+```bash
+POST /api/migration/discover
+```
+
+Verileri değiştirmeden tam şema analizi döndürür.
+
+### Göçü Çalıştır
+```bash
+POST /api/migration/migrate
+```
+
+MySQL/MSSQL'den MongoDB'ye tam göçü yapıp bilgiye aktarır.
+
+### Durumu Kontrol Et
+```bash
+GET /api/migration/status
+```
+
+Mevcut göç durumunu ve son rapor özetini döndürür.
+
+### Tam Rapor Al
+```bash
+GET /api/migration/report
+```
+
+Son göçün ayrıntılı teknik raporunu alır.
+
+### Bağlantı Testi
+```bash
+POST /api/migration/test-connection          # Kaynak veritabanını test et
+POST /api/migration/test-mongodb             # MongoDB'yi test et
+```
+
+## 💡 Kullanım Örnekleri
+
+### Örnek 1: Şema Keşfi
+
+```bash
+curl -X POST http://localhost:3000/api/migration/discover \
+  -H "Content-Type: application/json" \
+  -d '{
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "password",
+    "database": "mydb",
+    "dbType": "mysql"
+  }'
+```
+
+### Örnek 2: Tam Göçü Çalıştır
+
+```bash
+curl -X POST http://localhost:3000/api/migration/migrate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "password",
+    "database": "mydb",
+    "dbType": "mysql",
+    "mongoUri": "mongodb+srv://kullanici:sifre@cluster.mongodb.net/test_migration"
+  }'
+```
+
+### Örnek 3: Göç Raporunu Al
+
+```bash
+curl http://localhost:3000/api/migration/report
+```
+
+## 🔄 Desteklenen Veritabanı Türleri
+
+| Veritabanı | Sürüm | Durum |
+|----------|-------|-------|
+| **MySQL** | 5.7+ | ✅ Desteklenir |
+| **MSSQL** | 2019+ | ✅ Desteklenir |
+| **MongoDB** | 4.0+ | ✅ Hedef |
+
+## ⚠️ Dönüştürülemeyen Özellikler
+
+Aşağıdaki SQL özellikleri manuel uygulama gerektirir:
+
+### 1. **Trigger'lar** (SQL → Uygulama Mantığı)
+- MongoDB Change Streams kullan
+- Uygulama kodunda uygula (pre/post hooks)
+- Node.js için Mongoose middleware kullan
+
+### 2. **Stored Procedure'lar** (SQL → Node.js Fonksiyonları)
+- Uygulama fonksiyonları olarak yeniden yaz
+- MongoDB aggregation pipeline'larını kullan
+- Özel microservice'ler oluştur
+
+### 3. **Fonksiyonlar** (SQL → JavaScript)
+- JavaScript fonksiyonlarına dönüştür
+- Aggregation operatörlerini kullan
+- API uç noktaları olarak uygula
+
+### 4. **CHECK Constraint'ler** (SQL → Doğrulama)
+- Uygulama katmanında uygula
+- MongoDB JSON Schema doğrulaması kullan
+- Joi/Yup doğrulaması ekle
+
+**Detaylı çözümler ve kod örnekleri için [DOCUMENTATION.md](./DOCUMENTATION.md) dosyasını gör.**
+
+## 📊 MongoDB Tasarım Desenleri
+
+### 1. Bire-Çok İlişkileri
+```javascript
+// Gömme (alt öğe az ise)
+{
+  _id: 1,
+  name: "Ahmet",
+  addresses: [
+    { street: "123 Main", city: "NYC" },
+    { street: "456 Oak", city: "LA" }
+  ]
+}
+
+// Referans (alt öğe çok ise)
+{
+  _id: 1,
+  name: "Ahmet",
+  addressIds: [ObjectId(...), ObjectId(...)]
+}
+```
+
+### 2. Bileşik Anahtarlar
+```javascript
+// _id'de birden fazla alan kullan
+{
+  _id: {
+    userId: 1,
+    date: ISODate("2024-01-01")
+  },
+  data: {...}
+}
+```
+
+### 3. İndekslenen Alanlar
+MongoDB otomatik olarak indeks oluşturur:
+- Birincil Anahtarlar (`_id`)
+- Yabancı Anahtar Referansları
+- Benzersiz Alanlar
+- Sık Sorgulanan Alanlar
+
+## 🔒 Güvenlik Özellikleri
+
+- **Bağlantı Doğrulaması**: Göç öncesi veritabanı bağlantılarını test et
+- **Veri Şifrelemesi**: SSL/TLS bağlantılarını destekle
+- **Kimlik Bilgisi Yönetimi**: Güvenli şifre yönetimi (asla loglanmaz)
+- **Oran Sınırlaması**: Göç uç noktalarının kötüye kullanılmasını engelle
+- **JWT Kimlik Doğrulaması**: Hassas uç noktaları koru
+
+## 🎯 Yapılandırma
+
+### Ortam Değişkenleri (.env)
+
+```env
+# Sunucu
+NODE_ENV=development
+PORT=3000
+
+# MongoDB
+MONGODB_URI=mongodb+srv://kullanici:sifre@cluster.mongodb.net/test_migration
+
+# MySQL (test için)
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=password
+MYSQL_DATABASE=test_db
+
+# Güvenlik
+JWT_SECRET=your_complex_secret_key
+BCRYPT_ROUNDS=10
+```
+
+## 📈 Performance İyileştirme
+
+1. **Batch İşleme**: Veri optimize edilmiş batch'lerle aktarılır
+2. **Bağlantı Havuzu**: Veritabanı bağlantıları verimli şekilde yeniden kullanılır
+3. **İndeks Oluşturma**: İndeks oluşturma stratejisi optimize edilmiştir
+4. **Veri Doğrulaması**: Yerleşik şema doğrulaması
+5. **İzleme**: Performance analizi için detaylı günlükleme
+
+## 🐛 Sorun Giderme
+
+### Bağlantı Sorunları
+```bash
+# Kaynak veritabanı bağlantısını test et
+POST /api/migration/test-connection
+
+# MongoDB bağlantısını test et
+POST /api/migration/test-mongodb
+```
+
+### Büyük Veri Kümesi Göçü
+- `.env` dosyasında bağlantı havuzu boyutunu artır
+- Göçü yoğun olmayan saatlerde çalıştır
+- MongoDB CPU ve hafıza kullanımını izle
+- Kısmi göç yapmayı düşün (tablo tablo)
+
+### Veri Tipi Sorunları
+- Göç raporunda tür eşlemelerini gözden geçir
+- Kaynak ile MongoDB'deki dönüştürülen verileri kontrol et
+- Gerekirse özel dönüşüm uygula
+
+## 📋 Proje Yapısı
+
+```
+.
+├── src/
+│   ├── services/
+│   │   ├── discovery/          # Şema keşfi modülleri
+│   │   │   ├── MySQLSchemaDiscovery.js
+│   │   │   └── MSSQLSchemaDiscovery.js
+│   │   └── migration/          # Göç motoru
+│   │       ├── MigrationEngine.js
+│   │       └── MigrationReport.js
+│   ├── routes/
+│   │   └── migration.routes.js # API uç noktaları
+│   ├── config/                 # Yapılandırma dosyaları
+│   └── utils/                  # Yardımcı Programlar (logging, vb.)
+├── DOCUMENTATION.md            # Tam göç dokümantasyonu
+├── schema.sql                  # Test için örnek şema
+└── .env.example                # Ortam yapılandırma şablonu
+```
+
+## 🎬 Sonraki Adımlar
+
+1. **MongoDB Bağlantısını Yapılandır**
+   - `.env`'e MONGODB_URI ekle
+   - Bağlantı kimlik bilgilerinin doğru olduğundan emin ol
+
+2. **Örnek Veri ile Test Et**
+   - `schema.sql`'i MySQL veritabanına içe aktar
+   - Şemayı analiz etmek için keşif uç noktasını kullan
+   - MongoDB'ye göçü yürüt
+
+3. **Göç Raporunu İnceле**
+   - Oluşturulan raporu analiz et
+   - Dönüştürülemeyen özellikleri gözden geçir
+   - Uygulama seviyesi çözümleri uygula
+
+4. **Uygulamayı Güncelle**
+   - Bağlantı dizelerini MongoDB'ye güncelle
+   - Uygulama kodunu MongoDB sürücülerini kullanmak üzere migre et
+   - Tüm veritabanı işlemlerini test et
+
+5. **İzle ve Optimize Et**
+   - Sorgu performansı kontrol et
+   - İndeks kullanımını gözden geçir
+   - Erişim desenleri tabanlı optimize et
+
+## 📞 Destek
+
+Detaylı bilgi için:
+- **API Dokümantasyonu**: [DOCUMENTATION.md](./DOCUMENTATION.md) dosyasına bakın
+- **Swagger UI**: `http://localhost:3000/api-docs` adresinde erişin
+- **Günlükler**: Ayrıntılı göç günlükleri için konsol çıktısını kontrol edin
+- **Raporlar**: Oluşturulan göç raporlarını gözden geçirin
+
+## 📄 Lisans
+
+MIT Lisansı - Detaylar için LICENSE dosyasına bakın
+
+## 🔗 Faydalı Kaynaklar
+
+- [MongoDB Resmi Dokümanları](https://docs.mongodb.com/)
+- [MongoDB Şema Doğrulaması](https://docs.mongodb.com/manual/core/schema-validation/)
+- [MongoDB Değişim Akışları](https://docs.mongodb.com/manual/changeStreams/)
+- [MySQL Dokümantasyonu](https://dev.mysql.com/doc/)
+- [MSSQL Dokümantasyonu](https://docs.microsoft.com/sql/)
+
+---
+
+**Son Güncelleme**: Mayıs 2026  
+**Sürüm**: 1.0.0
 
 ## 🚀 Quick Start
 

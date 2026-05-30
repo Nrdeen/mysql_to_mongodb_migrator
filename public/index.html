@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>API Test UI (MongoDB ↔ MySQL Wrapper)</title>
+    <title>Database Migrator</title>
     <link rel="stylesheet" href="/ui/styles.css" />
   </head>
   <body>
     <header class="header">
       <div>
-        <div class="title">API Test UI</div>
-        <div class="subtitle">MongoDB ↔ MySQL wrapper • choose dbType per request</div>
+        <div class="title">Database Migrator</div>
+        <div class="subtitle">SQL (MySQL/MSSQL) → MongoDB Automatic Migration Tool</div>
       </div>
       <div class="controls">
         <label class="field">
@@ -26,123 +26,11 @@
 
     <main class="main">
       <div class="tabs">
-        <button class="tab-btn active" data-tab="auth-section">Kimlik Doğrulama & API</button>
-        <button class="tab-btn" data-tab="discover-section">🔍 Veritabanı Keşif & Aktar</button>
+        <button class="tab-btn active" data-tab="discover-section">🔍 Veritabanı Keşif & Aktar</button>
       </div>
 
-      <section id="auth-section" class="tab-content active card">
-        <h2>Kimlik Doğrulama</h2>
-        <div class="grid">
-          <div>
-            <h3>Kayıt Ol</h3>
-            <div class="row">
-              <input id="signupEmail" placeholder="email" />
-              <input id="signupPassword" placeholder="şifre" type="password" />
-            </div>
-            <div class="row">
-              <input id="signupName" placeholder="ad" value="Test User" />
-              <select id="signupRole">
-                <option value="user">user</option>
-                <option value="admin">admin</option>
-              </select>
-            </div>
-            <div class="row">
-              <button id="btnSignup" class="btn primary">Kayıt Ol</button>
-              <button id="btnFillUser" class="btn">Rastgele E-posta</button>
-            </div>
-          </div>
-
-          <div>
-            <h3>Giriş Yap</h3>
-            <div class="row">
-              <input id="loginEmail" placeholder="email" />
-              <input id="loginPassword" placeholder="şifre" type="password" />
-            </div>
-            <div class="row">
-              <button id="btnLogin" class="btn primary">Giriş Yap</button>
-              <button id="btnMe" class="btn">Benim Verilerim</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="grid">
-          <div>
-            <h3>Oturum (dbType başına)</h3>
-            <div class="row">
-              <input id="userId" placeholder="userId" />
-              <input id="postId" placeholder="postId" />
-              <input id="envelopeEId" placeholder="envelopeEId" />
-            </div>
-            <label class="field block">
-              <span>Token (dbType başına saklanır)</span>
-              <textarea id="token" rows="3" placeholder="JWT token"></textarea>
-            </label>
-            <div class="row">
-              <button id="btnSaveSession" class="btn">Oturumu Kaydet</button>
-              <button id="btnClearSession" class="btn danger">Oturumu Temizle</button>
-            </div>
-          </div>
-
-          <div>
-            <h3>Hızlı İşlemler</h3>
-            <div class="row wrap">
-              <button id="btnGetUser" class="btn">Kullanıcı Getir</button>
-              <button id="btnUpdateUser" class="btn">Kullanıcı Adını Güncelle</button>
-              <button id="btnCreatePost" class="btn">Post Oluştur</button>
-              <button id="btnGetPost" class="btn">Post Getir</button>
-              <button id="btnUpdatePost" class="btn">Post Yayınla</button>
-              <button id="btnDeletePost" class="btn danger">Post Sil</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>API Gezgini</h2>
-        <div class="row">
-          <label class="field grow">
-            <span>Metod</span>
-            <select id="method">
-              <option>GET</option>
-              <option>POST</option>
-              <option>PUT</option>
-              <option>PATCH</option>
-              <option>DELETE</option>
-            </select>
-          </label>
-          <label class="field grow2">
-            <span>Yol (bağıntılı)</span>
-            <input id="path" value="/api/auth/me" />
-          </label>
-          <button id="btnSend" class="btn primary">Gönder</button>
-        </div>
-        <label class="field block">
-          <span>JSON gövdesi (isteğe bağlı)</span>
-          <textarea id="body" rows="8" placeholder='{"example":true}'></textarea>
-        </label>
-        <div class="hint">
-          Not: Bu arayüz otomatik olarak <code>x-db-type</code> başlığı gönderir. <code>/api/*</code> uç noktaları için, sağlanmışsa bearer token'ını da gönderir.
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Yanıt</h2>
-        <div class="row">
-          <div class="pill" id="statusPill">—</div>
-          <div class="pill" id="dbPill">x-db-used: —</div>
-        </div>
-        <pre id="response" class="pre">(henüz istek yok)</pre>
-      </section>
-
-      <section class="card">
-        <h2>Şablonlar (tıklamak için yükle)</h2>
-        <div class="row wrap" id="templates"></div>
-      </section>
-
       <!-- Discover & Migration Section -->
-      <section id="discover-section" class="tab-content card">
+      <section id="discover-section" class="tab-content active card">
         <h2>🔍 Veritabanı Şemasını Keşfet ve MongoDB'ye Aktar</h2>
         
         <h3>Adım 1️⃣ : MySQL Bağlantı Bilgileri</h3>

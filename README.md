@@ -1,217 +1,335 @@
-# Node Manager Demo — MongoDB + MySQL Wrapper
+# Database Migrator — MySQL/MSSQL → MongoDB
 
-**🎯 Purpose**: Demonstrate that our MongoDB-based application now works with MySQL using the **same API contract**, achieved via a database wrapper.
+**🎯 Amaç**: MySQL ve MSSQL veritabanlarını MongoDB'ye otomatik olarak göçürmek için kapsamlı bir araç.
 
-> ⭐ **NEW TO THIS PROJECT?** Start with [`START_HERE.md`](START_HERE.md) - Simple 3-step guide!
+> ⭐ **İLK DEFA MI KULLANIYORSUNUZ?** [DOCUMENTATION.md](DOCUMENTATION.md) dosyasını okuyun - Detaylı teknik rehber
 > 
-> 📋 **FOR MANAGERS**: See [`MANAGER_QUICK_GUIDE.md`](MANAGER_QUICK_GUIDE.md) for 5-minute demo guide
+> 🚀 **HIZLI BAŞLANGAÇ**: Aşağıda 3 komutu çalıştırın
 
-## ⚡ Quick Start (3 Commands)
+## ⚡ Hızlı Başlangıç (3 Komut)
 
 ```bash
-npm install          # Install dependencies
-cp .env.example .env # Copy environment file
-npm run dev          # Start server
+npm install          # Bağımlılıkları yükle
+cp .env.example .env # Ayar dosyası oluştur
+npm run dev          # Sunucuyu başlat
 ```
 
-**Or use automated setup**:
-```bash
-npm run setup        # Installs dependencies and creates .env
-npm run dev          # Start server
+**Sunucu Adresler:**
+- **Swagger API Dokusu**: `http://localhost:3000/api-docs` ⭐ **Buradan başla**
+- **Web Arayüzü**: `http://localhost:3000/ui`
+- **Sağlık Kontrolü**: `http://localhost:3000/health`
+
+## 📋 Sistem Özeti
+
+Bu sistem aşağıdaki görevleri otomatik olarak yapar:
+
+✅ **Şema Keşfi** - Tüm tabloları, kolonları, ilişkileri, indeksleri ve constraint'leri tespit eder  
+✅ **Veri Analizi** - MongoDB'ye dönüştürülebilir ve dönüştürülemeyen yapıları belirler  
+✅ **Otomatik Göçürme** - Verileri güvenli ve tekrarlanabilir şekilde MongoDB'ye aktarır  
+✅ **Detaylı Raporlama** - Tüm işlemleri ve önerileri teknik rapor olarak sunar  
+
+## 📖 Dokümantasyon
+
+Lütfen aşağıdaki sırada okuyun:
+
+1. **[DOCUMENTATION.md](DOCUMENTATION.md)** ← **Ana Teknik Dokümantasyon** (Tüm detaylar burada)
+   - Veritabanı Keşif Süreci
+   - Tespit Edilen Nesnelerin Listesi
+   - MongoDB Veri Modeli
+   - Dönüştürülen Yapılar
+   - Dönüştürülemeyen Yapılar ve Çözüm Önerileri
+   - Karşılaşılan Problemler ve Çözümleri
+
+2. **Swagger UI**: `http://localhost:3000/api-docs` ← İnteraktif API Dokusu
+
+## 🎯 Temel Özellikler
+
+### 1. **Şema Keşfi**
+- MySQL/MSSQL'den tüm tabloları, kolonları otomatik tespit
+- Birincil anahtar, yabancı anahtar, unique constraint'ler
+- İndeksler, trigger'ler, stored procedure'ları tespit
+- Satır sayıları ve veri boyutları
+
+### 2. **Akıllı Veri Tipi Dönüşümü**
+
+| SQL Tipi | MongoDB Tipi |
+|----------|--------------|
+| INT, BIGINT | Number |
+| DECIMAL, FLOAT | Number / Decimal128 |
+| VARCHAR, TEXT | String |
+| DATE, DATETIME | Date |
+| BOOLEAN | Boolean |
+| JSON | Object |
+| BLOB | Binary |
+
+### 3. **İlişki Yönetimi**
+- Bire-çok ilişkiler: Embedding
+- Çok-çok ilişkiler: Referencing
+- Yabancı Anahtar: MongoDB referansları
+
+### 4. **Güvenli Veri Migrasyon**
+- **İdempotent**: Birden çalıştırılabilir (duplicate yok)
+- **Batch İşlemi**: Büyük veritabanları için hafiza yönetimi
+- **Hata Kurtarma**: Kapsamlı hata işleme
+- **Kontrol Noktaları**: Göçü gerçek zamanda izle
+
+### 5. **Kapsamlı Raporlar**
+Her göç sonunda:
+- Şema analizi
+- Dönüştürülen ve dönüştürülemeyen yapılar
+- Çözüm önerileri
+- Performance tavsiyeleri
+
+## 🛣️ Göç Süreci
+
+```
+1. Bağlantı Testi
+   ├─ Kaynak SQL veritabanını kontrol et
+   └─ MongoDB'ye bağlan
+
+2. Şema Keşfi
+   ├─ Tüm tabloları listele
+   ├─ Kolonları ve tipleri tespit et
+   ├─ İlişkileri harita
+   └─ İstatistik toplay
+
+3. Dönüştürme Planı
+   ├─ MongoDB koleksiyonlarını tasarla
+   ├─ İndeks stratejisini belirle
+   ├─ İlişki modelini seç
+   └─ Dönüştürülemeyen yapıları rapor et
+
+4. Veri Göçürme
+   ├─ Collections oluştur
+   ├─ Verileri batch'ler halinde aktar
+   ├─ İlişkiler ve referansları kur
+   └─ İndeksler oluştur
+
+5. Rapor Oluştur
+   ├─ Teknik rapor yaz
+   ├─ Başarı/başarısızlıkları belge
+   └─ Öneriler sun
 ```
 
-**Then open**:
-- **Swagger UI**: `http://localhost:3000/api-docs` ⭐ **Start here**
-- **Built-in UI**: `http://localhost:3000/ui`
-- **Health Check**: `http://localhost:3000/health`
+## 🔌 API Endpoints
 
-## 📋 Quick Overview
+### 1. Şema Keşfi
+```
+POST /api/migration/discover
 
-- ✅ **MongoDB**: Already implemented and working
-- ✅ **MySQL**: Added via wrapper — **same APIs work identically**
-- ✅ **Both Simultaneously**: Optional — choose database per request
+İstek:
+{
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "şifre",
+  "database": "mydb",
+  "dbType": "mysql"  // "mysql" veya "mssql"
+}
 
-## 📖 Documentation
+Yanıt:
+{
+  "success": true,
+  "schema": {
+    "tables": 15,
+    "columns": 120,
+    "relationships": 20,
+    // ...
+  }
+}
+```
 
-- **`MANAGER_README.md`** ← **Read this first** (manager-focused overview)
-- **`API_DOCUMENTATION.md`** ← Complete API reference
-- **`docs/MANAGER_DEMO.md`** ← Step-by-step demo script
-- **Swagger UI**: `http://localhost:3000/api-docs` ← Interactive API docs
+### 2. Veri Göçürme
+```
+POST /api/migration/migrate
 
-## Features
+İstek:
+{
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "şifre",
+  "database": "mydb",
+  "dbType": "mysql",
+  "mongoUri": "mongodb://localhost:27017/target"
+}
+```
 
-- Universal DB wrapper (`MongoAdapter`, `MySQLAdapter`) behind a common interface
-- Run **both DBs together** and choose backend per request via header `x-db-type: mongodb|mysql`
-- JWT auth (signup/login/me)
-- User CRUD with role-based authorization (admin vs user)
-- MySQL supports Mongo-like operators including `$or`, `$and`, `$in`, `$regex`
-- Security middleware: Helmet, CORS, rate limiting
-- Graceful shutdown
-- Demo endpoints to show **5+ wrapper operations**: `insertMany`, `updateMany`, `deleteMany`, `count`, `aggregate`
+### 3. Göç Durumu
+```
+GET /api/migration/status/:migrationId
 
-## Project Structure
+Yanıt: Ilerleme yüzdesi, işlenen tablo sayısı, hata bilgileri
+```
+
+### 4. Rapor İndir
+```
+GET /api/migration/report/:migrationId
+
+Yanıt: Detaylı teknik rapor (JSON)
+```
+
+## 📁 Proje Yapısı
 
 ```
 .
 ├── src/
-│   ├── app.js
+│   ├── app.js                    # Ana uygulama
 │   ├── config/
-│   │   ├── dbContext.js
-│   │   ├── database.js
-│   │   └── env.js
-│   ├── middleware/
-│   │   ├── auth.js
-│   │   ├── dbSelector.js
-│   │   └── errorHandler.js
-│   ├── models/
-│   │   ├── Post.js
-│   │   └── User.js
+│   │   ├── env.js               # Çevre değişkenleri
+│   │   └── database.js          # Veritabanı bağlantı
 │   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── demo.routes.js
-│   │   ├── post.routes.js
-│   │   └── user.routes.js
+│   │   └── migration.routes.js   # Migration API'ları
 │   ├── services/
-│   │   └── database/
-│   │       ├── BaseAdapter.js
-│   │       ├── DatabaseFactory.js
-│   │       ├── DatabaseManager.js
-│   │       ├── MongoAdapter.js
-│   │       └── MySQLAdapter.js
+│   │   ├── migration/
+│   │   │   ├── MigrationEngine.js      # Göç motor
+│   │   │   ├── MigrationReport.js      # Rapor oluşturucu
+│   │   │   └── ...
+│   │   └── discovery/
+│   │       ├── MySQLSchemaDiscovery.js # MySQL keşfi
+│   │       └── MSSQLSchemaDiscovery.js # MSSQL keşfi
 │   └── utils/
-│       ├── jwt.js
-│       └── logger.js
-├── .env
-├── .env.example
+│       └── logger.js             # Hata günlükleme
+├── public/
+│   ├── index.html               # Web arayüzü
+│   └── app.js                   # Frontend kodu
+├── docs/
+│   └── openapi.js               # Swagger şeması
+├── .env.example                 # Örnek ayar dosyası
 ├── package.json
-├── schema.sql
-└── postman_collection.json
+├── DOCUMENTATION.md             # ← ANA DOKÜMENTASYON
+└── README.md                    # Bu dosya
 ```
 
-## Setup
+## ⚙️ Kurulum
 
-### 1) Install
+### 1. Bağımlılıkları Yükle
 
 ```bash
 npm install
 ```
 
-### 2) Configure env
-
-Copy `.env.example` → `.env` and set values.
-
-### 3) Database setup
-
-#### MongoDB
-
-No schema required. Ensure Mongo is running and `MONGODB_URI` is correct.
-
-#### MySQL
-
-Create schema:
+### 2. Ayar Dosyası Oluştur
 
 ```bash
-/opt/homebrew/bin/mysql -u root -p < schema.sql
+cp .env.example .env
 ```
 
-Then set `DB_TYPE=mysql` in `.env`.
-
-#### Both at the same time
-
-In `.env`:
+`.env` dosyasını açıp bağlantı bilgilerini gir:
 
 ```env
-DB_TYPE=both
-DB_DEFAULT=mongodb
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/migration
+
+# MySQL (Opsiyonel)
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=şifre
+
+# MSSQL (Opsiyonel)
+MSSQL_SERVER=localhost
+MSSQL_USER=sa
+MSSQL_PASSWORD=şifre
+
+# Uygulama
+PORT=3000
+LOG_LEVEL=info
 ```
 
-Then select DB per request:
-
-- Header: `x-db-type: mongodb` or `x-db-type: mysql`
-- Or query: `?db=mongodb` / `?db=mysql`
-
-### 4) Run
+### 3. Testi Çalıştır
 
 ```bash
+npm test
+```
+
+### 4. Sunucuyu Başlat
+
+```bash
+# Development (Otomatik yeniden başlatma)
 npm run dev
+
+# Production
+npm start
 ```
 
-Server: `http://localhost:3000`
-Health: `GET /health`
+Server `http://localhost:3000` adresinde çalışacaktır.
 
-### Quick smoke test (MongoDB mode)
+## 🎯 İlk Kullanım Örneği
 
-Start the server, then:
-
-```bash
-npm run smoke:mongo
+### Adım 1: Swagger UI'ı Aç
+```
+http://localhost:3000/api-docs
 ```
 
-### One-command demo (Mongo → MySQL)
-
-If your MySQL credentials are set and schema exists, run:
-
-```bash
-npm run demo:mongo-mysql
+### Adım 2: Şema Keşfi Yap
+`POST /api/migration/discover` endpoint'ini çalıştır:
+```json
+{
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "password",
+  "database": "müşteri_db",
+  "dbType": "mysql"
+}
 ```
 
-## Postman
+### Adım 3: Sonuçları Gözden Geçir
+Yanıtı inceleyerek tespit edilen nesneleri gör
 
-Import `postman_collection.json` into Postman.
+### Adım 4: Göçürmeyi Başlat
+`POST /api/migration/migrate` endpoint'i ile veri aktarımını başlat
 
-Collection variables:
-- `baseUrl` (default `http://localhost:3000`)
-- `dbType` (default `mongodb`) — collection auto-sends header `x-db-type: {{dbType}}`
-- `token` (set automatically by the Login request test script)
+### Adım 5: Raporu İndir
+`GET /api/migration/report/:migrationId` ile detaylı teknik raporu indir
 
-## UI (testing only)
+## 📊 Desteklenen Veritabanı Nesneleri
 
-This repo includes a simple built-in UI to test all APIs without Postman:
+| Nesne | Tespit | MongoDB'ye | Açıklama |
+|-------|--------|-----------|---------|
+| Tablolar | ✅ | ✅ | Collections olarak |
+| Kolonlar | ✅ | ✅ | Alanlar olarak |
+| Birincil Anahtar | ✅ | ✅ | `_id` olarak |
+| Yabancı Anahtar | ✅ | ✅ | Referanslar |
+| İndeksler | ✅ | ✅ | MongoDB indeksler |
+| Unique Constraint | ✅ | ✅ | Unique indeksler |
+| NOT NULL | ✅ | ✅ | Şema doğrulaması |
+| CHECK Constraint | ✅ | ⚠️ | Uygulama katmanı |
+| Trigger'ler | ✅ | ⚠️ | Change Streams |
+| Stored Procedure'lar | ✅ | ⚠️ | Aggregation Pipeline |
 
-- Start the server: `npm run dev`
-- Open: `http://localhost:3000/ui`
+## 🔍 Sorun Giderme
 
-The UI lets you:
+### Bağlantı Hatası
+```
+Error: connect ECONNREFUSED
+```
+**Çözüm:** `.env` dosyasındaki veritabanı adresini ve portunu kontrol edin
 
-- choose `dbType` (mongodb/mysql)
-- signup/login to store a token **per dbType**
-- call endpoints and see JSON + `x-db-used` response header
+### Out of Memory
+```
+ERROR: JavaScript heap out of memory
+```
+**Çözüm:** `npm start` yerine batch işleme kullan (otomatik)
 
-## Swagger / OpenAPI
+### Duplicate Key Error
+```
+E11000 duplicate key error
+```
+**Çözüm:** Göçü yeniden çalıştır (idempotent - otomatik detektlenecek)
 
-- Swagger UI: `http://localhost:3000/api-docs`
-- OpenAPI JSON: `http://localhost:3000/openapi.json`
+## 📞 Destek
 
-## 📚 Documentation
+- **Teknik Sorular**: [DOCUMENTATION.md](DOCUMENTATION.md) dosyasını kontrol et
+- **API Sorguları**: Swagger UI'ı aç (`/api-docs`)
+- **Hataları Rapor Et**: `logs/` klasöründeki log dosyalarını kontrol et
 
-### ⭐ For Managers - Start Here
-- **`START_HERE.md`** ⭐⭐⭐ **READ THIS FIRST** — 3-step quick start
-- **`MANAGER_QUICK_GUIDE.md`** ⭐⭐ — 5-minute demo guide
-- **`DEMO_SCRIPT.md`** ⭐⭐ — Complete demo script for presentation
-- **`MANAGER_README.md`** — Complete manager overview
-- **`COMMANDS_AND_APIS.md`** — All commands & APIs reference
-- **`QUICK_REFERENCE.md`** — Quick reference card
+## 📄 Lisans
 
-### API Usage & Testing
-- **`RUN_API_TESTS.md`** ⭐⭐ — **Run all API tests** (MongoDB → MySQL → Both)
-- **`API_TESTING_GUIDE.md`** ⭐ — Complete testing guide with examples
-- **`POSTMAN_API_GUIDE.md`** ⭐ — Complete Postman API usage guide (all 28+ APIs explained)
-- **`FIX_USER_NOT_FOUND.md`** — Fix for "User not found" error
-- **`SWAGGER_AUTH_GUIDE.md`** — Swagger UI authentication guide
-- **`POSTMAN_MYSQL_SETUP.md`** — Postman setup for MySQL mode
+MIT
 
-### Technical Documentation
-- **`IMPLEMENTATION_FILES.md`** ⭐⭐⭐ — **Main files** where MySQL wrapper logic is implemented
-- **`KEY_FILES_QUICK_REFERENCE.md`** ⭐⭐ — Quick reference to key files and methods
-- **`WRAPPER_IMPLEMENTATION_GUIDE.md`** ⭐⭐ — **How wrapper works** (complete technical explanation)
-- **`CRUD_OPERATIONS_EXPLAINED.md`** ⭐⭐ — **CRUD operations** explained (MongoDB vs MySQL)
-- **`MANAGER_TECHNICAL_EXPLANATION.md`** ⭐ — Manager-friendly technical explanation
-- **`PROJECT_DOCUMENTATION.md`** — Architecture + how code works
-- **`WRAPPER_USAGE_GUIDE.md`** — How to use the wrapper in your code
-- **`TESTING_GUIDE.md`** — Detailed testing instructions
-- **`docs/MANAGER_DEMO.md`** — Step-by-step demo script
+---
 
-### Deployment & Scaling
-- **`AWS_DEPLOYMENT_GUIDE.md`** — Deploy on AWS (EC2 + RDS + DocumentDB)
-- **`SCALABILITY_GUIDE.md`** — Production scaling strategies
-
+**Son Güncelleme:** 30 Mayıs 2026  
+**Sürüm:** 1.0.0

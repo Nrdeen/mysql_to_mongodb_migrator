@@ -1,7 +1,7 @@
 {
-  "name": "mongodb-mysql-wrapper",
+  "name": "database-migrator",
   "version": "1.0.0",
-  "description": "Universal database wrapper supporting MongoDB and MySQL",
+  "description": "Comprehensive tool for discovering and migrating database schemas from MySQL/MSSQL to MongoDB",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
