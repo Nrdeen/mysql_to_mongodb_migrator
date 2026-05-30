@@ -299,33 +299,8 @@ Yanıtı inceleyerek tespit edilen nesneleri gör
 | Trigger'ler | ✅ | ⚠️ | Change Streams |
 | Stored Procedure'lar | ✅ | ⚠️ | Aggregation Pipeline |
 
-## 🔍 Sorun Giderme
 
-### Bağlantı Hatası
-```
-Error: connect ECONNREFUSED
-```
-**Çözüm:** `.env` dosyasındaki veritabanı adresini ve portunu kontrol edin
 
-### Out of Memory
-```
-ERROR: JavaScript heap out of memory
-```
-**Çözüm:** `npm start` yerine batch işleme kullan (otomatik)
-
-### Duplicate Key Error
-```
-E11000 duplicate key error
-```
-**Çözüm:** Göçü yeniden çalıştır (idempotent - otomatik detektlenecek)
-
-## 📞 Destek
-
-- **Teknik Sorular**: [DOCUMENTATION.md](DOCUMENTATION.md) dosyasını kontrol et
-- **API Sorguları**: Swagger UI'ı aç (`/api-docs`)
-- **Hataları Rapor Et**: `logs/` klasöründeki log dosyalarını kontrol et
-
-## 📄 Lisans
 
 MIT
 
