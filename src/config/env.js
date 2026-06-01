@@ -15,11 +15,27 @@ module.exports = {
       uriReadOnly: process.env.MONGODB_URI_READ_ONLY,
       options: {
         autoIndex: false,
-        maxPoolSize: 20
+        maxPoolSize: 20,
+        minPoolSize: 5,
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+        family: 4,
+        authSource: 'admin',
+        retryWrites: true,
+        tls: true,
+        tlsInsecure: true
       },
       optionsReadOnly: {
         autoIndex: false,
-        maxPoolSize: 100
+        maxPoolSize: 100,
+        minPoolSize: 5,
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+        family: 4,
+        authSource: 'admin',
+        retryWrites: true,
+        tls: true,
+        tlsInsecure: true
       }
     },
 

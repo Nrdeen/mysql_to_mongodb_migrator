@@ -176,7 +176,17 @@ router.post('/migrate', async (req, res) => {
 
       // Connect to MongoDB
       const { MongoClient } = require('mongodb');
-      const mongoClient = new MongoClient(mongoUri);
+      const mongoClient = new MongoClient(mongoUri, {
+        maxPoolSize: 20,
+        minPoolSize: 5,
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+        family: 4,
+        authSource: 'admin',
+        retryWrites: true,
+        tls: true,
+        tlsInsecure: true
+      });
       await mongoClient.connect();
 
       const mongoDb = mongoClient.db(database);
