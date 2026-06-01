@@ -9,7 +9,7 @@ ASM523 İleri Veritabanı Yönetim Sistemleri dersinin final projesi.
 
 **Tanıtım videosu:** https://drive.google.com/file/d/1sp5GTBJwkxepWOmK3R5nnV_9gwnFOjRG/view?usp=sharing
 
-**Teknik analiz raporu:** [25619824009_NrdeenAnber_DatabaseMigrator_ProjeRaporu.pdf](25619824009_NrdeenAnber_DatabaseMigrator_ProjeRaporu.pdf)
+**Teknik analiz raporu:** https://drive.google.com/file/d/1nWhDmNoItCFPfIG0cF2qdAABoOJAZG_Y/view?usp=sharing
 
 ## Projenin Amacı ve Neleri Kapsıyor
 
@@ -27,12 +27,10 @@ Bu proje final ödevinin istediklerine göre yaptılmıştır. Proje şunları y
 ```bash
 npm install
 ```
-
 2. Sonra uygulamayı başlatın:
 ```bash
 npm start
 ```
-
 3. Uygulamanın web sayfasını görmek için tarayıcınızdan şu adrese gidin:
 ```
 http://localhost:3000/ui
@@ -48,9 +46,6 @@ Tablolar (MongoDB'de 'Collection' oluyor), kayıtlar (MongoDB'de 'Document' oluy
 
 Tetikleyiciler (Trigger'lar), saklı yordamlar/fonksiyonlar (Stored Procedure/Function) ve kontrol kısıtlamaları (CHECK Constraint) MongoDB'de doğrudan olmadığı için bunlar taşınmadı. Bu yapıların neden dönüştürülemediği ve bunları program katmanında (Application Layer) nasıl halledebileceğimizle ilgili teknik detaylar ve çözüm önerileri raporun içinde daha ayrıntılı anlatılıyor.
 
----
 
-**Lisans:** MIT  
-**Sürüm:** 1.0.0
 
 
